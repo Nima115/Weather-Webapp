@@ -1,9 +1,41 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 export default function WeatherApp() {
+  // Progress state och indikator för fakta
+  const facts = [
+    "Sverige har över 100 000 sjöar.",
+    "Australien har flest giftiga djurarter i världen.",
+    "Japan har över 6 800 öar.",
+    "Brasilien har världens största regnskog, Amazonas.",
+    "Kanada har flest sjöar av alla länder.",
+    "Egypten har världens längsta flod, Nilen.",
+    "Finland har flest bastur per person.",
+    "Indien har världens största demokrati.",
+    "Kina har världens största befolkning.",
+    "Norge har världens längsta fjord, Sognefjorden."
+  ];
+  const [factIndex, setFactIndex] = useState(0);
+  const [progress, setProgress] = useState(0);
+  // Rulla vidare till nästa fakta var 5:e sekund
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setFactIndex((prev) => (prev + 1) % facts.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+  useEffect(() => {
+    setProgress(0);
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) return 0;
+        return prev + 2;
+      });
+    }, 100);
+    return () => clearInterval(interval);
+  }, [factIndex]);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
@@ -85,7 +117,16 @@ export default function WeatherApp() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <h1 className="text-3xl font-bold mb-6">Weather Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-2">Weather Dashboard</h1>
+      <div className="mb-6 text-center text-gray-700 text-sm animate-fade">
+        <span className="font-semibold">Visste du:</span> {facts[factIndex]}
+        <div className="w-full h-2 bg-gray-200 rounded mt-2">
+          <div
+            className="h-2 bg-blue-400 rounded"
+            style={{ width: `${progress}%`, transition: 'width 0.1s linear' }}
+          ></div>
+        </div>
+      </div>
       <div className="flex w-full max-w-md gap-2 relative">
         <input
           type="text"
